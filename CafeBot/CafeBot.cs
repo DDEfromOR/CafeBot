@@ -18,28 +18,33 @@ namespace CafeBot
         static DateTime reservationDate;
         static int partySize;
         static string reservationName;
+        const string DATETIMEPROMPT = "dateTimePrompt";
+        const string PARYSIZEPROMPT = "partySizePrompt";
+        const string RESERVATIONNAMEPROMPT = "reservationNamePrompt";
+
 
         public CafeBot()
         {
+            dialogs = new DialogSet();
             dialogs.Add("reserveTable", new WaterfallStep[]
             {
                 async (dc, args, next) =>
                 {
                     await dc.Context.SendActivity("Welcome to the reservation service.");
-                    await dc.Prompt("dateTimePrompt", "Please provide a reservation date and time.");
+                    await dc.Prompt(DATETIMEPROMPT, "Please provide a reservation date and time.");
                 },
                 async (dc, args, next) =>
                 {
                     var dateTimeResult = ((DateTimeResult)args).Resolution.First();
                     reservationDate = Convert.ToDateTime(dateTimeResult.Value);
 
-                    await dc.Prompt("partySizePrompt", "How many people are in your party?");
+                    await dc.Prompt(PARYSIZEPROMPT, "How many people are in your party?");
                 },
                 async (dc, args, next) =>
                 {
                     partySize = (int)args["Value"];
 
-                    await dc.Prompt("textPrompt", "Whose name will this be under?");
+                    await dc.Prompt(RESERVATIONNAMEPROMPT, "Whose name will this be under?");
                 },
                 async (dc, args, next) =>
                 {
@@ -54,9 +59,9 @@ namespace CafeBot
                 }
             });
 
-            dialogs.Add("dateTimePrompt", new Microsoft.Bot.Builder.Dialogs.DateTimePrompt(Culture.English));
-            dialogs.Add("partySizePrompt", new Microsoft.Bot.Builder.Dialogs.NumberPrompt<int>(Culture.English));
-            dialogs.Add("textPrompt", new Microsoft.Bot.Builder.Dialogs.TextPrompt());
+            dialogs.Add(DATETIMEPROMPT, new Microsoft.Bot.Builder.Dialogs.DateTimePrompt(Culture.English));
+            dialogs.Add(PARYSIZEPROMPT, new Microsoft.Bot.Builder.Dialogs.NumberPrompt<int>(Culture.English));
+            dialogs.Add(RESERVATIONNAMEPROMPT, new Microsoft.Bot.Builder.Dialogs.TextPrompt());
         }
 
         public async Task OnTurn(ITurnContext context)
